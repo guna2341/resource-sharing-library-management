@@ -230,7 +230,7 @@ export default function CommunitiesPage() {
       });
   }, [selectedCommunity?.communityId]);
 
-  // Live polling for discourse stream
+  // Live polling for discourse stream without overwriting newly sent messages
   useEffect(() => {
     if (!selectedCommunity) return;
     const interval = setInterval(async () => {
@@ -238,10 +238,16 @@ export default function CommunitiesPage() {
         const msgRes = await getCommunityMessages(selectedCommunity.communityId);
         if (msgRes.success && Array.isArray(msgRes.data)) {
           setMessages((prev) => {
-            if (prev.length !== msgRes.data.length) {
-              return msgRes.data;
-            }
-            return prev;
+            const serverIds = new Set(msgRes.data.map((m) => String(m.id || m.messageId)));
+            // Keep any locally created message that isn't yet in server list
+            const pending = prev.filter((p) => {
+              const pId = String(p.id || p.messageId);
+              const pText = (p.content || p.message || '').trim();
+              return !serverIds.has(pId) && !msgRes.data.some((m) => (m.content || m.message || '').trim() === pText);
+            });
+            const merged = [...msgRes.data, ...pending];
+            merged.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+            return merged;
           });
         }
       } catch {}
@@ -314,42 +320,60 @@ export default function CommunitiesPage() {
 
   async function handleSendMessage(e) {
     if (e) e.preventDefault();
-    if (!messageText.trim() || !selectedCommunity?.communityId || !user?.userId) return;
+    if (!messageText.trim() || !selectedCommunity?.communityId) return;
     const content = messageText.trim();
     setMessageText('');
     setSendingMessage(true);
 
+    const currentUserId = user?.userId || 1;
+    const currentUsername = user?.username || 'You';
+    const currentProfileUrl = user?.profileUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80';
+    const localMsgId = Date.now();
+
+    const optimisticMsg = {
+      messageId: localMsgId,
+      id: localMsgId,
+      content: content,
+      message: content,
+      createdAt: new Date().toISOString(),
+      user: {
+        userId: currentUserId,
+        username: currentUsername,
+        profileUrl: currentProfileUrl,
+      },
+      sender: {
+        userId: currentUserId,
+        username: currentUsername,
+        profileUrl: currentProfileUrl,
+      },
+      senderId: {
+        userId: currentUserId,
+        username: currentUsername,
+        profileUrl: currentProfileUrl,
+      }
+    };
+
+    setMessages((prev) => [...prev, optimisticMsg]);
+
     try {
-      const res = await sendCommunityMessage(selectedCommunity.communityId, user.userId, { content });
+      const res = await sendCommunityMessage(selectedCommunity.communityId, currentUserId, {
+        content,
+        username: currentUsername,
+        profileUrl: currentProfileUrl,
+      });
+
       if (res.success && res.data) {
-        setMessages((prev) => [...prev, res.data]);
-      } else {
-        const fallbackMsg = {
-          messageId: Date.now(),
-          content: content,
-          message: content,
-          createdAt: new Date().toISOString(),
-          user: {
-            userId: user.userId,
-            username: user.username || 'You',
-            profileUrl: user.profileUrl,
-          }
-        };
-        setMessages((prev) => [...prev, fallbackMsg]);
+        const confirmedId = res.data.id || res.data.messageId || localMsgId;
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.messageId === localMsgId || m.id === localMsgId
+              ? { ...optimisticMsg, ...res.data, id: confirmedId, messageId: confirmedId }
+              : m
+          )
+        );
       }
     } catch {
-      const fallbackMsg = {
-        messageId: Date.now(),
-        content: content,
-        message: content,
-        createdAt: new Date().toISOString(),
-        user: {
-          userId: user.userId,
-          username: user.username || 'You',
-          profileUrl: user.profileUrl,
-        }
-      };
-      setMessages((prev) => [...prev, fallbackMsg]);
+      // Optimistic message remains in state
     } finally {
       setSendingMessage(false);
       setTimeout(() => {
@@ -603,7 +627,7 @@ export default function CommunitiesPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-140px)] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-185px)] min-h-[500px] overflow-hidden">
         {/* Left Study Circles Directory Sidebar */}
         <div className="w-full lg:w-84 xl:w-96 bg-white border-r border-slate-200/80 flex flex-col flex-shrink-0 shadow-xs z-10">
           {/* Top Filter & Search */}
@@ -883,13 +907,13 @@ export default function CommunitiesPage() {
                   ) : (
                     messages.map((msg) => {
                       const msgId = msg.id || msg.messageId;
-                      const sender = msg.sender || msg.user || {};
-                      const senderId = sender.userId || msg.userId || msg.senderId;
-                      const isMe = String(senderId) === String(user?.userId);
+                      const sender = msg.sender || msg.user || (typeof msg.senderId === 'object' ? msg.senderId : {});
+                      const rawSenderId = sender.userId || msg.userId || (typeof msg.senderId !== 'object' ? msg.senderId : msg.senderId?.userId);
+                      const isMe = String(rawSenderId) === String(user?.userId) || (sender.username && sender.username === user?.username) || rawSenderId === 'You';
                       const msgKey = String(msgId);
                       const reactions = messageReactions[msgKey] || {};
                       const authorName = isMe ? 'You' : (sender.username || msg.senderName || 'Scholar');
-                      const avatar = sender.profileUrl || msg.avatarUrl;
+                      const avatar = sender.profileUrl || msg.avatarUrl || (isMe ? user?.profileUrl : null);
                       const body = msg.content || msg.message;
 
                       return (
