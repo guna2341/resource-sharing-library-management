@@ -208,14 +208,23 @@ export default function NetworkPage() {
   // Books published by spotlight author
   const authorSpotlightBooks = useMemo(() => {
     if (!currentSpotlightAuthor) return [];
-    return books.filter((b) => {
+    let list = books.filter((b) => {
       if (typeof b.author === 'object') {
         return String(b.author?.authorId) === String(currentSpotlightAuthor.authorId) ||
           b.author?.name?.toLowerCase() === currentSpotlightAuthor.name?.toLowerCase();
       }
       return String(b.author).toLowerCase() === currentSpotlightAuthor.name?.toLowerCase();
     });
-  }, [books, currentSpotlightAuthor]);
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter((b) =>
+        (b.title || '').toLowerCase().includes(q) ||
+        (b.category || '').toLowerCase().includes(q) ||
+        (b.description || '').toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [books, currentSpotlightAuthor, searchQuery]);
 
   // Posts by spotlight author
   const authorSpotlightPosts = useMemo(() => {
@@ -250,12 +259,15 @@ export default function NetworkPage() {
         if (!hasTag) return false;
       }
 
-      // Search query
+      // Search query across content, author, department, book title/desc/category, and tags
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const contentMatch = (p.content || '').toLowerCase().includes(q);
-        const authorMatch = (p.author?.name || '').toLowerCase().includes(q);
-        const bookMatch = (p.attachedBook?.title || '').toLowerCase().includes(q);
+        const authorMatch = (p.author?.name || '').toLowerCase().includes(q) ||
+          (p.author?.department || '').toLowerCase().includes(q);
+        const bookMatch = (p.attachedBook?.title || '').toLowerCase().includes(q) ||
+          (p.attachedBook?.category || '').toLowerCase().includes(q) ||
+          (p.attachedBook?.description || '').toLowerCase().includes(q);
         const tagMatch = (p.tags || []).some((t) => t.toLowerCase().includes(q));
         if (!contentMatch && !authorMatch && !bookMatch && !tagMatch) return false;
       }
@@ -303,10 +315,31 @@ export default function NetworkPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+            {/* Global Scholar Network Search */}
+            <div className="relative w-full sm:w-72 md:w-80">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search discussions, faculty, tags, books..."
+                className="input-base pl-9 pr-8 py-2 text-xs rounded-xl w-full bg-slate-50 border-slate-200 focus:bg-white focus:border-indigo-500 shadow-2xs transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-200 transition-colors"
+                  title="Clear search"
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
+
             <button
               onClick={() => setShowComposeModal(true)}
-              className="btn-accent text-xs px-4 py-2.5 shadow-md shadow-indigo-500/20"
+              className="btn-accent text-xs px-4 py-2.5 shadow-md shadow-indigo-500/20 whitespace-nowrap justify-center"
             >
               <Plus size={15} /> Broadcast Update
             </button>
@@ -416,7 +449,13 @@ export default function NetworkPage() {
                 {allTags.map((tag) => (
                   <button
                     key={tag}
-                    onClick={() => setSelectedTag(tag)}
+                    onClick={() => {
+                      if (selectedTag === tag && tag !== 'ALL') {
+                        setSelectedTag('ALL');
+                      } else {
+                        setSelectedTag(tag);
+                      }
+                    }}
                     className={cn(
                       'px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all',
                       selectedTag === tag
@@ -605,15 +644,49 @@ export default function NetworkPage() {
                 </div>
 
                 <div className="relative min-w-[220px]">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   <input
                     type="text"
                     placeholder="Filter posts & faculty..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="input-base pl-8 py-1.5 text-xs rounded-xl"
+                    className="input-base pl-8 pr-7 py-1.5 text-xs rounded-xl"
                   />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-200 transition-colors"
+                      title="Clear filter"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
                 </div>
+              </div>
+            )}
+
+            {/* Active Search & Filter Banner */}
+            {searchQuery.trim() && (
+              <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-indigo-50 border border-indigo-200/80 text-xs text-indigo-950 shadow-2xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center flex-shrink-0">
+                    <Search size={13} />
+                  </div>
+                  <div className="truncate">
+                    <span className="font-medium text-slate-600">Showing results for: </span>
+                    <span className="font-bold text-indigo-900 font-mono">"{searchQuery}"</span>
+                    <span className="ml-2 font-mono text-[11px] text-indigo-600 bg-indigo-100/80 px-2 py-0.5 rounded-md font-bold">
+                      {filteredPosts.length} updates found
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="btn-ghost text-xs px-2.5 py-1 text-indigo-700 hover:text-indigo-950 hover:bg-indigo-100/80 flex items-center gap-1 font-bold rounded-lg flex-shrink-0"
+                >
+                  <X size={12} /> Clear Filter
+                </button>
               </div>
             )}
 
@@ -818,10 +891,14 @@ export default function NetworkPage() {
               <div className="space-y-6">
                 {filteredPosts.length === 0 ? (
                   <div className="enterprise-card p-12 text-center bg-white space-y-3">
-                    <Globe size={32} className="mx-auto text-slate-300" />
-                    <h3 className="text-base font-extrabold text-slate-800">No matching research updates</h3>
+                    <Search size={32} className="mx-auto text-slate-300" />
+                    <h3 className="text-base font-extrabold text-slate-800">
+                      {searchQuery ? `No updates matching "${searchQuery}"` : 'No matching research updates'}
+                    </h3>
                     <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                      {activeTab === 'following'
+                      {searchQuery
+                        ? 'Try searching with different keywords, faculty names, or research topics.'
+                        : activeTab === 'following'
                         ? 'You are not following any authors who posted in this category. Follow faculty from the recommendations list!'
                         : 'No posts match your current filter criteria.'}
                     </p>
@@ -832,9 +909,9 @@ export default function NetworkPage() {
                         setSearchQuery('');
                         handleSelectAuthor(null);
                       }}
-                      className="btn-ghost text-xs px-4 py-2"
+                      className="btn-accent text-xs px-4 py-2"
                     >
-                      Reset Feed Filters
+                      Reset All Filters & Search
                     </button>
                   </div>
                 ) : (
