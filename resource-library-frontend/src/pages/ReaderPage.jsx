@@ -100,7 +100,11 @@ export default function ReaderPage() {
     const category = book.category || 'Academic Literature';
     const authorName = book.author?.name || 'Faculty Author';
     const desc = book.description || 'Comprehensive academic study focusing on state-of-the-art methodology, theoretical foundations, and practical empirical evaluation.';
-    const tags = book.tags ? book.tags.split(',').map((t) => t.trim()).filter(Boolean) : [category];
+    const tags = Array.isArray(book.tags)
+      ? book.tags
+      : typeof book.tags === 'string'
+      ? book.tags.split(',').map((t) => t.trim()).filter(Boolean)
+      : [category];
 
     return [
       {
