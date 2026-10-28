@@ -30,8 +30,16 @@ export const getCommunitiesUserIn = async (userId) => {
 };
 
 export const createCommunity = async (data) => {
+  const payload = {
+    name: data.name,
+    description: data.description || '',
+    createdBy: data.createdBy,
+  };
+  if (data.profileUrl && (data.profileUrl.startsWith('http://') || data.profileUrl.startsWith('https://'))) {
+    payload.profileUrl = data.profileUrl;
+  }
   try {
-    const res = await api.post('/api/v1/communities', data);
+    const res = await api.post('/api/v1/communities', payload);
     if (res.data?.success) return res.data;
   } catch (e) {}
   const created = mockStore.createCommunity(data);
@@ -104,11 +112,17 @@ export const addCommunityMember = async (communityId, memberId) => {
   return { success: true, message: 'Joined study circle successfully' };
 };
 
-export const deleteCommunityMember = async (communityMemberId) => {
-  try {
-    const res = await api.delete(`/api/v1/communities/members/deletemember/${communityMemberId}`);
-    if (res.data?.success) return res.data;
-  } catch (e) {}
+export const deleteCommunityMember = async (communityMemberId, communityId) => {
+  if (communityMemberId) {
+    try {
+      const res = await api.delete(`/api/v1/communities/members/deletemember/${communityMemberId}`);
+      if (res.data?.success) {
+        if (communityId) mockStore.leaveCommunity(communityId);
+        return res.data;
+      }
+    } catch (e) {}
+  }
+  if (communityId) mockStore.leaveCommunity(communityId);
   return { success: true, message: 'Left community' };
 };
 
@@ -121,11 +135,16 @@ export const getCommunityMessages = async (communityId) => {
 };
 
 export const sendCommunityMessage = async (communityId, senderId, data) => {
+  const content = (typeof data === 'string' ? data : data.content || data.message || '').trim();
+  const payload = {
+    content,
+    message: content,
+  };
   try {
-    const res = await api.post(`/api/v1/messages/${communityId}/${senderId}`, data);
+    const res = await api.post(`/api/v1/messages/${communityId}/${senderId}`, payload);
     if (res.data?.success) return res.data;
   } catch (e) {}
-  const sent = mockStore.sendMessage(communityId, senderId, data.content || data.message || '');
+  const sent = mockStore.sendMessage(communityId, senderId, content);
   return { success: true, message: 'Message sent', data: sent };
 };
 
