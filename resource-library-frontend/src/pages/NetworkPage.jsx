@@ -326,10 +326,10 @@ export default function NetworkPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-8 items-start">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)_260px] xl:grid-cols-[240px_minmax(0,1fr)_280px] gap-4 lg:gap-5 xl:gap-6 items-start">
           {/* LEFT COLUMN: Scholar Identity & Following Registry */}
-          <div className="space-y-6">
+          <div className="space-y-5 min-w-0">
             {/* Identity Card */}
             <div className="enterprise-card p-6 bg-white space-y-4">
               <div className="flex items-center gap-3.5">
@@ -450,10 +450,10 @@ export default function NetworkPage() {
           </div>
 
           {/* CENTER COLUMN: Main Social Feed & Author Dossier */}
-          <div className="space-y-6">
+          <div className="space-y-5 min-w-0">
             {/* Quick Compose Box */}
             {!selectedAuthorId && (
-              <div className="enterprise-card p-5 bg-white space-y-3 shadow-xs">
+              <div className="enterprise-card p-4 sm:p-5 bg-white space-y-3 shadow-xs">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
                     {getInitials(user?.username || 'You')}
@@ -466,16 +466,10 @@ export default function NetworkPage() {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                <div className="flex items-center justify-end pt-2 border-t border-slate-100 text-xs">
                   <button
                     onClick={() => setShowComposeModal(true)}
-                    className="btn-ghost text-xs px-3 py-1.5 text-slate-600 gap-1.5"
-                  >
-                    <BookOpen size={14} className="text-indigo-600" /> Link Catalog Manuscript
-                  </button>
-                  <button
-                    onClick={() => setShowComposeModal(true)}
-                    className="btn-accent text-xs px-4 py-1.5 shadow-sm"
+                    className="btn-accent text-xs px-4 py-1.5 shadow-sm flex items-center gap-1.5"
                   >
                     <Sparkles size={13} /> Post Update
                   </button>
@@ -1265,9 +1259,9 @@ export default function NetworkPage() {
           </div>
 
           {/* RIGHT COLUMN: Recommended Faculty & Book Releases */}
-          <div className="space-y-6">
+          <div className="space-y-5 min-w-0">
             {/* Faculty Recommendations to Follow */}
-            <div className="enterprise-card p-6 bg-white space-y-4">
+            <div className="enterprise-card p-5 bg-white space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                 <h3 className="text-xs font-bold uppercase font-mono tracking-wider text-slate-900 flex items-center gap-1.5">
                   <UserPlus size={14} className="text-indigo-600" />
