@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Globe, Users, UserPlus, UserCheck, Heart, ThumbsUp, MessageSquare,
+  Globe, User, Users, UserPlus, UserCheck, Heart, ThumbsUp, MessageSquare,
   Share2, Send, BookOpen, Sparkles, Filter, Plus, X, Search,
   CheckCircle2, Clock, Award, Bookmark, ExternalLink, Hash,
   GraduationCap, FileText, ArrowRight, ShieldCheck, MoreHorizontal,
