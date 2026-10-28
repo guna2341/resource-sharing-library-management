@@ -315,31 +315,10 @@ export default function NetworkPage() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-            {/* Global Scholar Network Search */}
-            <div className="relative w-full sm:w-72 md:w-80">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search discussions, faculty, tags, books..."
-                className="input-base pl-9 pr-8 py-2 text-xs rounded-xl w-full bg-slate-50 border-slate-200 focus:bg-white focus:border-indigo-500 shadow-2xs transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-200 transition-colors"
-                  title="Clear search"
-                >
-                  <X size={13} />
-                </button>
-              )}
-            </div>
-
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setShowComposeModal(true)}
-              className="btn-accent text-xs px-4 py-2.5 shadow-md shadow-indigo-500/20 whitespace-nowrap justify-center"
+              className="btn-accent text-xs px-4 py-2.5 shadow-md shadow-indigo-500/20 whitespace-nowrap"
             >
               <Plus size={15} /> Broadcast Update
             </button>
@@ -610,75 +589,87 @@ export default function NetworkPage() {
               </motion.div>
             )}
 
-            {/* Filter Navigation Tabs Bar */}
-            {!selectedAuthorId && (
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/80 text-xs font-bold">
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setActiveTab('all')}
-                    className={cn(
-                      'px-3.5 py-1.5 rounded-lg transition-all',
-                      activeTab === 'all' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                    )}
-                  >
-                    All Feed ({posts.length})
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('following')}
-                    className={cn(
-                      'px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1',
-                      activeTab === 'following' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                    )}
-                  >
-                    <UserCheck size={13} /> Following Only
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('books')}
-                    className={cn(
-                      'px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1',
-                      activeTab === 'books' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                    )}
-                  >
-                    <BookOpen size={13} /> Book Releases
-                  </button>
-                </div>
-
-                <div className="relative min-w-[220px]">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                  <input
-                    type="text"
-                    placeholder="Filter posts & faculty..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="input-base pl-8 pr-7 py-1.5 text-xs rounded-xl"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-200 transition-colors"
-                      title="Clear filter"
-                    >
-                      <X size={12} />
-                    </button>
+            {/* Filter Navigation Tabs Bar with Single Unified Search */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-slate-200/80 shadow-xs">
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                <button
+                  onClick={() => {
+                    handleSelectAuthor(null);
+                    setActiveTab('all');
+                  }}
+                  className={cn(
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap',
+                    activeTab === 'all' && !selectedAuthorId
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   )}
-                </div>
+                >
+                  All Feed ({posts.length})
+                </button>
+                <button
+                  onClick={() => {
+                    handleSelectAuthor(null);
+                    setActiveTab('following');
+                  }}
+                  className={cn(
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap',
+                    activeTab === 'following' && !selectedAuthorId
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  )}
+                >
+                  <UserCheck size={13} /> Following Only
+                </button>
+                <button
+                  onClick={() => {
+                    handleSelectAuthor(null);
+                    setActiveTab('books');
+                  }}
+                  className={cn(
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap',
+                    activeTab === 'books' && !selectedAuthorId
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  )}
+                >
+                  <BookOpen size={13} /> Book Releases
+                </button>
               </div>
-            )}
 
-            {/* Active Search & Filter Banner */}
+              {/* Polished, properly padded Search Bar */}
+              <div className="relative w-full sm:w-64 md:w-72">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search faculty, topics, posts..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ paddingLeft: '2.35rem', paddingRight: '2rem' }}
+                  className="w-full bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-xs py-2 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-200 transition-colors"
+                    title="Clear filter"
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Active Search Results Banner - No clipping, clean badge */}
             {searchQuery.trim() && (
-              <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-indigo-50 border border-indigo-200/80 text-xs text-indigo-950 shadow-2xs">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center flex-shrink-0">
-                    <Search size={13} />
-                  </div>
-                  <div className="truncate">
-                    <span className="font-medium text-slate-600">Showing results for: </span>
-                    <span className="font-bold text-indigo-900 font-mono">"{searchQuery}"</span>
-                    <span className="ml-2 font-mono text-[11px] text-indigo-600 bg-indigo-100/80 px-2 py-0.5 rounded-md font-bold">
-                      {filteredPosts.length} updates found
-                    </span>
-                  </div>
+              <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-indigo-50/90 border border-indigo-200/80 text-xs text-indigo-950 shadow-2xs">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Search size={14} className="text-indigo-600 flex-shrink-0" />
+                  <span className="text-slate-700">
+                    Results for <strong className="font-mono text-indigo-950 font-bold">"{searchQuery}"</strong>
+                  </span>
+                  <span className="bg-indigo-200/70 text-indigo-900 text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap">
+                    {filteredPosts.length} {filteredPosts.length === 1 ? 'update found' : 'updates found'}
+                  </span>
                 </div>
 
                 <button
