@@ -78,6 +78,8 @@ export default function CommunitiesPage() {
   const [circleWorkspaceTab, setCircleWorkspaceTab] = useState('discourse'); // discourse | syllabus | vault
   const [members, setMembers] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(5);
+  const [loadingOlder, setLoadingOlder] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -208,6 +210,7 @@ export default function CommunitiesPage() {
     }
 
     setChatLoading(true);
+    setVisibleCount(5);
     Promise.all([
       getCommunityMessages(commId).catch(() => ({ success: false, data: [] })),
       getCommunityMembers(commId).catch(() => ({ success: false, data: [] })),
@@ -229,6 +232,39 @@ export default function CommunitiesPage() {
         }, 100);
       });
   }, [selectedCommunity?.communityId]);
+
+  // Reverse infinite scroll: Load most recent 5 messages, and fetch earlier on scroll up
+  const visibleMessages = messages.slice(-visibleCount);
+  const hasOlderMessages = messages.length > visibleCount;
+
+  function loadOlderMessages() {
+    if (!hasOlderMessages || loadingOlder) return;
+    setLoadingOlder(true);
+    const container = chatContainerRef.current;
+    const oldScrollHeight = container ? container.scrollHeight : 0;
+    const oldScrollTop = container ? container.scrollTop : 0;
+
+    setTimeout(() => {
+      setVisibleCount((prev) => Math.min(messages.length, prev + 5));
+      setLoadingOlder(false);
+
+      // Smoothly preserve scroll position so the view doesn't jump
+      requestAnimationFrame(() => {
+        if (container) {
+          const newScrollHeight = container.scrollHeight;
+          container.scrollTop = newScrollHeight - oldScrollHeight + oldScrollTop;
+        }
+      });
+    }, 280);
+  }
+
+  function handleChatScroll(e) {
+    const el = e.target;
+    // When user scrolls near top (within 40px)
+    if (el.scrollTop <= 40 && hasOlderMessages && !loadingOlder) {
+      loadOlderMessages();
+    }
+  }
 
   // Live polling for discourse stream without overwriting newly sent messages
   useEffect(() => {
@@ -353,6 +389,7 @@ export default function CommunitiesPage() {
       }
     };
 
+    setVisibleCount((prev) => prev + 1);
     setMessages((prev) => [...prev, optimisticMsg]);
 
     try {
@@ -892,7 +929,11 @@ export default function CommunitiesPage() {
                 </div>
 
                 {/* Messages Feed */}
-                <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-6 sm:px-8 py-4 space-y-4">
+                <div
+                  ref={chatContainerRef}
+                  onScroll={handleChatScroll}
+                  className="flex-1 overflow-y-auto px-6 sm:px-8 py-4 space-y-4"
+                >
                   {chatLoading ? (
                     <div className="text-center py-12 text-xs font-mono text-slate-400 space-y-2">
                       <div className="w-5 h-5 border-2 border-slate-300 border-t-indigo-600 rounded-full animate-spin mx-auto" />
@@ -905,7 +946,37 @@ export default function CommunitiesPage() {
                       <p className="mt-1">Initiate the peer discussion by posing a thesis question below.</p>
                     </div>
                   ) : (
-                    messages.map((msg) => {
+                    <>
+                      {/* Top Banner: Load Older Messages or Beginning of Stream */}
+                      {hasOlderMessages && (
+                        <div className="text-center py-2 sticky top-0 z-10">
+                          <button
+                            type="button"
+                            onClick={loadOlderMessages}
+                            disabled={loadingOlder}
+                            className="text-[11px] font-mono text-indigo-700 hover:text-indigo-900 bg-white/95 backdrop-blur-xs hover:bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-200/90 shadow-xs transition-all inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                          >
+                            {loadingOlder ? (
+                              <>
+                                <span className="w-3 h-3 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                                <span>Loading earlier messages...</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>↑ Scroll up or tap to load {Math.min(5, messages.length - visibleCount)} earlier messages ({messages.length - visibleCount} older)</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
+
+                      {!hasOlderMessages && messages.length > 5 && (
+                        <div className="text-center py-2 text-[10px] font-mono text-slate-400 border-b border-slate-200/60 pb-3 mb-2">
+                          ✦ Initial seminar messages reached · Showing all {messages.length} discourse entries ✦
+                        </div>
+                      )}
+
+                      {visibleMessages.map((msg) => {
                       const msgId = msg.id || msg.messageId;
                       const sender = msg.sender || msg.user || (typeof msg.senderId === 'object' ? msg.senderId : {});
                       const rawSenderId = sender.userId || msg.userId || (typeof msg.senderId !== 'object' ? msg.senderId : msg.senderId?.userId);
@@ -1022,9 +1093,10 @@ export default function CommunitiesPage() {
                           </div>
                         </div>
                       );
-                    })
-                  )}
-                </div>
+                    })}
+                  </>
+                )}
+              </div>
 
                 {/* Professional Compose Input Bar */}
                 <div className="p-4 sm:p-5 bg-white border-t border-slate-200/80">
