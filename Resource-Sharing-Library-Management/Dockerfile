@@ -18,7 +18,8 @@ WORKDIR /app
 
 COPY --from=builder /app/target/*.jar app.jar
 
-ENV PORT=8080
+ENV AWS_EC2_METADATA_DISABLED=true
+ENV PORT=10000
 EXPOSE ${PORT}
 
 ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=${PORT}"]
