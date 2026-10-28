@@ -393,11 +393,20 @@ export default function NetworkPage() {
                       onClick={() => handleSelectAuthor(author.authorId)}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
+                        <Link
+                          to={`/authors/${author.authorId}`}
+                          className="w-8 h-8 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 hover:border-indigo-400 transition-colors"
+                          title="View Author Page"
+                        >
                           <img src={author.profileUrl} alt="" className="w-full h-full object-cover" />
-                        </div>
+                        </Link>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-900 truncate hover:text-indigo-600">{author.name}</p>
+                          <Link
+                            to={`/authors/${author.authorId}`}
+                            className="text-xs font-bold text-slate-900 truncate hover:text-indigo-600 block"
+                          >
+                            {author.name}
+                          </Link>
                           <p className="text-[10px] text-slate-400 truncate">{author.department || 'Faculty'}</p>
                         </div>
                       </div>
@@ -515,6 +524,14 @@ export default function NetworkPage() {
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
+                      <Link
+                        to={`/authors/${currentSpotlightAuthor.authorId}`}
+                        className="text-xs px-3 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-xs"
+                        title="Open full author profile and published bibliography"
+                      >
+                        <User size={13} /> Full Works Page
+                      </Link>
+
                       <button
                         onClick={() => handleToggleFollow(currentSpotlightAuthor.authorId, currentSpotlightAuthor.name)}
                         className={cn(
@@ -1283,11 +1300,22 @@ export default function NetworkPage() {
                       onClick={() => handleSelectAuthor(author.authorId)}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 shadow-xs">
+                        <Link
+                          to={`/authors/${author.authorId}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 shadow-xs hover:border-indigo-400 transition-colors"
+                          title="View Author Page"
+                        >
                           <img src={author.profileUrl} alt="" className="w-full h-full object-cover" />
-                        </div>
+                        </Link>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-900 truncate hover:text-indigo-600">{author.name}</p>
+                          <Link
+                            to={`/authors/${author.authorId}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-xs font-bold text-slate-900 truncate hover:text-indigo-600 block"
+                          >
+                            {author.name}
+                          </Link>
                           <p className="text-[10px] text-slate-400 truncate">{author.department || 'Professor'}</p>
                           <span className="text-[9px] font-mono text-indigo-600">{author.publicationsCount || 8} works</span>
                         </div>

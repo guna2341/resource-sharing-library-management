@@ -17,6 +17,7 @@ import ProfilePage from './pages/ProfilePage';
 import CommunitiesPage from './pages/CommunitiesPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import AuthorsPage from './pages/AuthorsPage';
+import AuthorDetailPage from './pages/AuthorDetailPage';
 import WishlistPage from './pages/WishlistPage';
 import AdminPage from './pages/AdminPage';
 import NetworkPage from './pages/NetworkPage';
@@ -116,6 +117,22 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <AuthorsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/authors/:authorId"
+              element={
+                <ProtectedRoute>
+                  <AuthorDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/author/:authorId"
+              element={
+                <ProtectedRoute>
+                  <AuthorDetailPage />
                 </ProtectedRoute>
               }
             />

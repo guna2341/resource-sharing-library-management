@@ -276,13 +276,17 @@ export default function AuthorsPage() {
                   <div>
                     {/* Header: Photo & Quick Actions */}
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs flex-shrink-0">
+                      <Link
+                        to={`/authors/${author.authorId}`}
+                        className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs flex-shrink-0 block group-hover:border-indigo-400 transition-colors"
+                        title={`View ${author.name}'s profile and published works`}
+                      >
                         <img
                           src={author.profileUrl || DEFAULT_AUTHOR_AVATAR}
                           alt=""
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
-                      </div>
+                      </Link>
 
                       {isAdmin && (
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -310,15 +314,20 @@ export default function AuthorsPage() {
                       )}
                     </div>
 
-                    <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                      {author.name}
-                    </h3>
-                    <p className="text-[11px] font-mono text-indigo-600 font-semibold mt-0.5">
-                      {author.department || 'Faculty Researcher'}
-                    </p>
-                    <p className="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
-                      {author.bio || 'Author contributing to academic library collections.'}
-                    </p>
+                    <Link
+                      to={`/authors/${author.authorId}`}
+                      className="block group/link"
+                    >
+                      <h3 className="text-base font-bold text-slate-900 group-hover/link:text-indigo-600 transition-colors">
+                        {author.name}
+                      </h3>
+                      <p className="text-[11px] font-mono text-indigo-600 font-semibold mt-0.5">
+                        {author.department || 'Faculty Researcher'}
+                      </p>
+                      <p className="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
+                        {author.bio || 'Author contributing to academic library collections.'}
+                      </p>
+                    </Link>
                   </div>
 
                   {/* Footer Metrics & Dossier CTA */}
@@ -346,12 +355,14 @@ export default function AuthorsPage() {
                           </>
                         )}
                       </button>
-                      <button
-                        onClick={() => setSelectedAuthor(author)}
-                        className="btn-ghost text-xs px-2.5 py-1 bg-slate-50 hover:bg-white text-indigo-700 font-bold"
+                      <Link
+                        to={`/authors/${author.authorId}`}
+                        className="btn-accent text-xs px-2.5 py-1 shadow-xs flex items-center gap-1"
+                        title="View profile and published works"
                       >
-                        Dossier
-                      </button>
+                        <span>Works</span>
+                        <ArrowRight size={11} />
+                      </Link>
                     </div>
                   </div>
                 </div>

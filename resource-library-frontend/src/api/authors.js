@@ -3,6 +3,12 @@ import { mockStore } from './mockStore';
 
 export const getAuthors = async () => {
   try {
+    const res = await api.get('/api/v1/author');
+    if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+      return res.data;
+    }
+  } catch (e) {}
+  try {
     const res = await api.get('/api/v1/authors');
     if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
       return res.data;
@@ -12,6 +18,10 @@ export const getAuthors = async () => {
 };
 
 export const getAuthorById = async (authorId) => {
+  try {
+    const res = await api.get(`/api/v1/author/${authorId}`);
+    if (res.data?.success && res.data.data) return res.data;
+  } catch (e) {}
   try {
     const res = await api.get(`/api/v1/authors/${authorId}`);
     if (res.data?.success && res.data.data) return res.data;
