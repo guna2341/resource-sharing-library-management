@@ -62,6 +62,12 @@
         }
 
         public String getPresignedUrl(String fileName) {
+            if (fileName == null || fileName.isBlank()) {
+                return null;
+            }
+            if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
+                return fileName;
+            }
 
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(storageBuckets.get(Bucket.DOCUMENTS))
