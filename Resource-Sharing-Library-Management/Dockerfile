@@ -1,7 +1,24 @@
-FROM openjdk:22-jdk
+# Multi-stage Dockerfile for Spring Boot Backend on Render / Docker
+# Stage 1: Build the JAR with Maven Wrapper
+FROM eclipse-temurin:21-jdk AS builder
+WORKDIR /app
 
-COPY target/Resource-Sharing-Library-Management-0.0.1-SNAPSHOT.jar app.jar
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+RUN chmod +x mvnw
+# Cache maven dependencies layer
+RUN ./mvnw dependency:go-offline -B || true
 
-EXPOSE 8080
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Stage 2: Minimal JRE runtime image
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
+ENV PORT=8080
+EXPOSE ${PORT}
+
+ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=${PORT}"]
