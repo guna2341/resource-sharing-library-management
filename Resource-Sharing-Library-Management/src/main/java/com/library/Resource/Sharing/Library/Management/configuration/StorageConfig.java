@@ -11,7 +11,10 @@ import java.util.Map;
 public class StorageConfig {
 
     @Bean
-    public Map<Bucket, String> storageBuckets(@Value("${supabase.s3.buckets.images}") String imageBucket, @Value("${supabase.s3.buckets.documents}") String documentBucket) {
+    public Map<Bucket, String> storageBuckets(
+            @Value("${supabase.s3.buckets.images:images}") String imageBucket,
+            @Value("${supabase.s3.buckets.documents:documents}") String documentBucket
+    ) {
         return Map.of(
                 Bucket.IMAGES, imageBucket,
                 Bucket.DOCUMENTS, documentBucket

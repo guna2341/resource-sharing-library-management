@@ -17,16 +17,16 @@ import java.net.URI;
 @Configuration
 public class S3StorageConfig {
 
-    @Value("${supabase.s3.endpoint}")
+    @Value("${supabase.s3.endpoint:${SUPABASE_ENDPOINT:https://fziqmrelkosjdkbyvsij.storage.supabase.co/storage/v1/s3}}")
     private String endpoint;
 
-    @Value("${supabase.s3.region}")
+    @Value("${supabase.s3.region:${SUPABASE_REGION:ap-south-1}}")
     private String region;
 
-    @Value(("${supabase.s3.access-key}"))
+    @Value("${supabase.s3.access-key:${SUPABASE_ACCESS_KEY:c0d7b6f00a91975c6cda09f423103477}}")
     private String accessKey;
 
-    @Value("${supabase.s3.secret-key}")
+    @Value("${supabase.s3.secret-key:${SUPABASE_SECRET_KEY:b0a951b5ac957e2266d895b223c506d98f0f3c4d6bb21fa0f6b3dced738797d2}}")
     private String secretKey;
 
     private final Logger LOGGER = LoggerFactory.getLogger(S3StorageConfig.class);

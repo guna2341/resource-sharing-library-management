@@ -26,7 +26,7 @@
 
         private final Map<Bucket, String> storageBuckets;
 
-        @Value("${supabase.url}")
+        @Value("${supabase.url:https://fziqmrelkosjdkbyvsij.supabase.co}")
         private String supabaseUrl;
 
         public StorageService(S3Client s3Client, Map<Bucket, String> storageBuckets, S3Presigner s3Presigner) {
