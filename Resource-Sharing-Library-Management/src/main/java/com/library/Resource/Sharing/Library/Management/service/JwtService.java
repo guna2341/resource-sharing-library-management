@@ -33,4 +33,33 @@ public class JwtService {
                 .compact();
     }
 
+    public io.jsonwebtoken.Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public String extractEmail(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    public Long extractUserId(String token) {
+        Object id = extractAllClaims(token).get("userId");
+        if (id instanceof Number number) {
+            return number.longValue();
+        }
+        return null;
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            io.jsonwebtoken.Claims claims = extractAllClaims(token);
+            return claims.getExpiration().after(new Date());
+        } catch (Exception e) {
+            LOGGER.debug("JWT token validation failed: {}", e.getMessage());
+            return false;
+        }
+    }
 }

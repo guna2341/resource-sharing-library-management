@@ -15,6 +15,12 @@ public class AdminController {
 
     private AdminService adminService;
 
+    @GetMapping("/users")
+    public ResponseEntity<ApiResponse> getAllUsers() {
+        ApiResponse response = adminService.getAllUsers();
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/users")
     public ResponseEntity<ApiResponse> addUser(@Valid @RequestBody AddUserRequest request) {
         ApiResponse response = adminService.addUser(request);

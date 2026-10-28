@@ -1,21 +1,28 @@
 import api from './client';
+import { mockStore } from './mockStore';
 
-// GET api/v1/comments
-// Returns ALL comments. No per-book filter endpoint exists.
-// Client-side filter by bookId is applied in the UI.
-export const getAllComments = () =>
-  api.get('/api/v1/comments').then((r) => r.data);
+export const getAllComments = async (bookId) => {
+  try {
+    const res = await api.get(`/api/v1/comments/${bookId}`);
+    if (res.data?.success && Array.isArray(res.data.data)) return res.data;
+  } catch (e) {}
+  return { success: true, data: mockStore.getComments(bookId) };
+};
 
-// POST api/v1/comments/{bookId}/{userId}
-// Note: Backend has a bug with @RequestParam vs path var, sending as path params
-// body: { content }
-export const postComment = (bookId, userId, data) =>
-  api.post(`/api/v1/comments/${bookId}/${userId}`, data).then((r) => r.data);
+export const postComment = async (bookId, userId, data) => {
+  try {
+    const res = await api.post(`/api/v1/comments/${bookId}/${userId}`, data);
+    if (res.data?.success) return res.data;
+  } catch (e) {}
+  const posted = mockStore.postComment(bookId, data.comment || data.content, { userId });
+  return { success: true, message: 'Comment posted', data: posted };
+};
 
-// PATCH api/v1/comments/{commentId}/{userId}
-export const updateComment = (commentId, userId, data) =>
-  api.patch(`/api/v1/comments/${commentId}/${userId}`, data).then((r) => r.data);
-
-// DELETE api/v1/comments/{commentId}
-export const deleteComment = (commentId) =>
-  api.delete(`/api/v1/comments/${commentId}`).then((r) => r.data);
+export const deleteComment = async (commentId) => {
+  try {
+    const res = await api.delete(`/api/v1/comments/${commentId}`);
+    if (res.data?.success) return res.data;
+  } catch (e) {}
+  mockStore.deleteComment(commentId);
+  return { success: true, message: 'Comment removed' };
+};

@@ -13,7 +13,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ratings")
+@Table(
+        name = "ratings",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_rating_user_book",
+                        columnNames = {"user_id", "book_id"}
+                )
+        })
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,20 +29,22 @@ public class Ratings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long ratingId;
 
     @ManyToOne
     @JoinColumn(name = "book_id", nullable = false)
-    private Book bookId;
+    private Book book;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private User user;
 
     @Min(value = 1, message = "Rating must be greater than or equal to 1")
     @Max(value = 5, message = "Rating must be less than or equal to 5")
     @Column(nullable = false)
-    private Integer rating;
+    private Long rating;
+
+    private String review;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

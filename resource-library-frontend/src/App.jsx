@@ -14,6 +14,12 @@ import BookDetailPage from './pages/BookDetailPage';
 import ReaderPage from './pages/ReaderPage';
 import UploadPage from './pages/UploadPage';
 import ProfilePage from './pages/ProfilePage';
+import CommunitiesPage from './pages/CommunitiesPage';
+import LeaderboardPage from './pages/LeaderboardPage';
+import AuthorsPage from './pages/AuthorsPage';
+import WishlistPage from './pages/WishlistPage';
+import AdminPage from './pages/AdminPage';
+import NetworkPage from './pages/NetworkPage';
 
 export default function App() {
   return (
@@ -50,6 +56,14 @@ export default function App() {
               }
             />
             <Route
+              path="/overview"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/library"
               element={
                 <ProtectedRoute>
@@ -74,6 +88,46 @@ export default function App() {
               }
             />
             <Route
+              path="/communities"
+              element={
+                <ProtectedRoute>
+                  <CommunitiesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/network"
+              element={
+                <ProtectedRoute>
+                  <NetworkPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/leaderboard"
+              element={
+                <ProtectedRoute>
+                  <LeaderboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/authors"
+              element={
+                <ProtectedRoute>
+                  <AuthorsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wishlist"
+              element={
+                <ProtectedRoute>
+                  <WishlistPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/upload"
               element={
                 <ProtectedRoute>
@@ -86,6 +140,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
                 </ProtectedRoute>
               }
             />

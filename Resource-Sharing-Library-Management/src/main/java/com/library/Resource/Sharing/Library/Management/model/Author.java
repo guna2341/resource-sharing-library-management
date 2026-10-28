@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 @Entity(name = "authors")
 public class Author {
 
-    @Column(name = "author_id")
     @Id
+    @Column(name = "author_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long authorId;
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class AdminService {
 
     private UserRepository userRepository;
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
@@ -41,10 +42,16 @@ public class AdminService {
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .build();
         User savedUser = userRepository.save(user);
         return new ApiResponse(true, "User added successfully.", getUserResponse(savedUser));
+    }
+
+    public ApiResponse getAllUsers() {
+        java.util.List<User> users = userRepository.findAll();
+        java.util.List<UserResponse> responses = users.stream().map(this::getUserResponse).toList();
+        return new ApiResponse(true, "Users fetched successfully.", responses);
     }
 
     @Transactional
@@ -54,6 +61,5 @@ public class AdminService {
         userRepository.delete(user);
         return new ApiResponse(true, "User deleted successfully.");
     }
-
 
 }

@@ -66,6 +66,10 @@ public class AuthService {
             throw new ResourceNotFoundException("User is not registered");
         }
 
+        if (!passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
+            throw new BadRequest("Invalid email or password");
+        }
+
 //        Generate token
         String token = jwtService.generateToken(user.get());
 

@@ -2,6 +2,8 @@ package com.library.Resource.Sharing.Library.Management.exception;
 
 import com.library.Resource.Sharing.Library.Management.dto.response.ApiResponse;
 import com.library.Resource.Sharing.Library.Management.dto.response.FieldErrorResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -37,11 +39,32 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse> handleConstraintViolation(
+            ConstraintViolationException ex) {
+
+        String message = ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .findFirst()
+                .orElse("Validation failed");
+
+        ApiResponse response = new ApiResponse(false, message);
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
 //    User side exceptions
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ApiResponse> handleUserAlreadyExistsException(DuplicateResourceException ex) {
         ApiResponse response = new ApiResponse(false, ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(BadRequest.class)
+    public ResponseEntity<ApiResponse> handleBadRequest(BadRequest ex) {
+        ApiResponse response = new ApiResponse(false, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
@@ -98,7 +121,6 @@ public class GlobalExceptionHandler {
 
                 response.put("error", "Invalid enum value");
                 response.put("field", field);
-                response.put("allowedValues", enumValues);
                 response.put(
                         "message",
                         "Invalid value for field '" + field +

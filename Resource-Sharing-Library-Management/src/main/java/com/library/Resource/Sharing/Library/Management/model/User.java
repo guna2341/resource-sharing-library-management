@@ -41,13 +41,19 @@ public class User {
     private Boolean isVerified = false;
 
     @Column(name = "total_books_stock")
-    private Integer totalBooksStock = 0;
+    private Long totalBooksStock = 0L;
 
     @Column(name = "total_books_uploaded")
-    private Integer totalBooksUploaded = 0;
+    private Long totalBooksUploaded = 0L;
+
+    @Column(name = "total_books_downloaded")
+    private Long totalBooksDownloaded = 0L;
 
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
+
+    @Column(name = "reading_streak")
+    private Long readingStreak;
 
     @Column(name = "last_login")
     @CreationTimestamp
@@ -65,8 +71,9 @@ public class User {
     public void setDefaultValues() {
         if (isVerified == null) isVerified = false;
         if (role == null) role = UserRole.USER;
-        if (totalBooksStock == null) totalBooksStock = 0;
-        if (totalBooksUploaded == null) totalBooksUploaded = 0;
+        if (totalBooksStock == null) totalBooksStock = 0L;
+        if (totalBooksUploaded == null) totalBooksUploaded = 0L;
+        if (totalBooksDownloaded == null) totalBooksDownloaded = 0L;
     }
 
 }

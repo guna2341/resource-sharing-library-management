@@ -12,7 +12,8 @@ public interface CommentRepository extends JpaRepository<Comments, Long> {
     @Query("""
             SELECT c
             FROM Comments c
+            WHERE bookId = :bId
             """)
-    List<CommentsProjection> getAllComments();
+    List<CommentsProjection> getAllComments(Long bId);
 
 }

@@ -181,6 +181,31 @@ export default function LoginPage() {
                 {loading ? 'Signing In...' : 'Sign In to Account'}
               </button>
             </form>
+
+            {/* Quick Demo Evaluation Credentials */}
+            <div className="mt-6 pt-5 border-t border-slate-100">
+              <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider text-center mb-3">
+                Quick Evaluation Mode
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => onSubmit({ email: 'scholar@university.edu', password: 'Password123!' })}
+                  className="p-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 text-left transition-all group"
+                >
+                  <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-600">Lead Scholar</p>
+                  <p className="text-[10px] text-slate-400 font-mono">1-Click Sign In</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSubmit({ email: 'admin@library.enterprise.edu', password: 'Password123!' })}
+                  className="p-2.5 rounded-xl border border-slate-200 hover:border-rose-300 hover:bg-rose-50/50 text-left transition-all group"
+                >
+                  <p className="text-xs font-bold text-slate-900 group-hover:text-rose-600">Admin Principal</p>
+                  <p className="text-[10px] text-slate-400 font-mono">1-Click Sign In</p>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

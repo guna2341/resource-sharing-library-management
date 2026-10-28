@@ -38,17 +38,25 @@ export default function LandingPage() {
   const [activeTab, setActiveTab] = useState('reader');
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    });
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-    return () => lenis.destroy();
+    let lenis;
+    let reqId;
+    try {
+      lenis = new Lenis({
+        duration: 1.1,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      });
+      function raf(time) {
+        lenis.raf(time);
+        reqId = requestAnimationFrame(raf);
+      }
+      reqId = requestAnimationFrame(raf);
+    } catch {}
+
+    return () => {
+      if (reqId) cancelAnimationFrame(reqId);
+      if (lenis?.destroy) lenis.destroy();
+    };
   }, []);
 
   useEffect(() => {

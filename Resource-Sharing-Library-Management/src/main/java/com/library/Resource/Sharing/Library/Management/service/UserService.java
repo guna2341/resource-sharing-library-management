@@ -1,6 +1,5 @@
 package com.library.Resource.Sharing.Library.Management.service;
 
-import com.library.Resource.Sharing.Library.Management.dto.request.auth.PasswordRequest;
 import com.library.Resource.Sharing.Library.Management.dto.request.users.UserRequest;
 import com.library.Resource.Sharing.Library.Management.dto.response.ApiResponse;
 import com.library.Resource.Sharing.Library.Management.dto.response.users.UserResponse;
@@ -10,8 +9,6 @@ import com.library.Resource.Sharing.Library.Management.model.User;
 import com.library.Resource.Sharing.Library.Management.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

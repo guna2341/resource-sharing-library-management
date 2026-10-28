@@ -12,6 +12,10 @@ public interface BookProjection {
 
     String getDescription();
 
+    String getCategory();
+
+    String getTags();
+
     Integer getVersion();
 
     Integer getPages();

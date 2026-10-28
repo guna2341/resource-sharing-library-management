@@ -51,12 +51,22 @@ export const selectBooksLoading = (s) => s.books.loading;
 export const selectBooksError = (s) => s.books.error;
 export const selectSearchQuery = (s) => s.books.searchQuery;
 export const selectFilteredBooks = (s) => {
-  const q = s.books.searchQuery.toLowerCase().trim();
+  const q = (s.books.searchQuery || '').toLowerCase().trim();
   if (!q) return s.books.items;
-  return s.books.items.filter(
-    (b) =>
-      b.title?.toLowerCase().includes(q) ||
-      b.author?.toLowerCase().includes(q) ||
-      b.description?.toLowerCase().includes(q)
-  );
+  return s.books.items.filter((b) => {
+    if (!b) return false;
+    const title = (b.title || '').toLowerCase();
+    const author = (typeof b.author === 'object' ? (b.author?.name || '') : String(b.author || '')).toLowerCase();
+    const desc = (b.description || '').toLowerCase();
+    const cat = (b.category || '').toLowerCase();
+    const tags = Array.isArray(b.tags) ? b.tags.map((t) => String(t).toLowerCase()) : [];
+
+    return (
+      title.includes(q) ||
+      author.includes(q) ||
+      desc.includes(q) ||
+      cat.includes(q) ||
+      tags.some((t) => t.includes(q))
+    );
+  });
 };

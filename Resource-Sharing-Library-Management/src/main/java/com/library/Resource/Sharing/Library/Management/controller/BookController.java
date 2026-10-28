@@ -65,4 +65,10 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{bookId}/download/{userId}")
+    public ResponseEntity<ApiResponse> recordDownload(@PathVariable Long bookId, @PathVariable Long userId) {
+        ApiResponse response = bookService.recordBookDownload(bookId, userId);
+        return ResponseEntity.ok(response);
+    }
+
 }

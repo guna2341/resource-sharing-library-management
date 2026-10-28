@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "userId",
         "username",
@@ -38,9 +39,9 @@ public class UserResponse {
 
     Boolean isVerified;
 
-    Integer totalBooksStock;
+    Long totalBooksStock;
 
-    Integer totalBooksUploaded;
+    Long totalBooksUploaded;
 
     UserRole role;
 

@@ -1,0 +1,12 @@
+{
+  "name": "resource-sharing-library-management-root",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npm --prefix resource-library-frontend run dev",
+    "build": "npm --prefix resource-library-frontend run build",
+    "preview": "npm --prefix resource-library-frontend run preview",
+    "frontend": "npm --prefix resource-library-frontend run dev",
+    "backend": "cd Resource-Sharing-Library-Management && .\\mvnw.cmd spring-boot:run"
+  }
+}

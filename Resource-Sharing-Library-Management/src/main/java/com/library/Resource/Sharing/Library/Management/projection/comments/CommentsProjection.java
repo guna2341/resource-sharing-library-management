@@ -1,23 +1,23 @@
 package com.library.Resource.Sharing.Library.Management.projection.comments;
 
-import com.library.Resource.Sharing.Library.Management.model.User;
-import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Data
-public class CommentsProjection {
+public interface CommentsProjection {
 
-    private String commentId;
+     String getCommentId();
 
-    private String content;
+     String getContent();
 
-    private Long likes;
+    UserProjection getUser();
 
-    private User user;
+    interface UserProjection {
+        Long getUserId();
+        String getUsername();
+        String getProfileUrl();
+    }
+     LocalDateTime getCreatedAt();
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
+     LocalDateTime getUpdatedAt();
 
 }

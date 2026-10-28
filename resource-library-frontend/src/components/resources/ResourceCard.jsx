@@ -1,58 +1,39 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, FileText, ArrowUpRight, BookOpen, Layers, User } from 'lucide-react';
-import { cn, fileTypeLabel, fileTypeColor, coverGradient, getInitials } from '../../lib/utils';
+import { cn, fileTypeLabel, fileTypeColor, coverGradient, getInitials, DEFAULT_BOOK_COVER, getBookCover } from '../../lib/utils';
 
-export function CoverImage({ book, size = 'default' }) {
+export function CoverImage({ book, coverUrl, title, fileType, version, size = 'default' }) {
   const aspectClass = size === 'lg' ? 'aspect-[4/5]' : 'aspect-[3/4]';
-
-  if (book.coverUrl) {
-    return (
-      <div className={cn('relative w-full overflow-hidden bg-slate-900', aspectClass)}>
-        <img
-          src={book.coverUrl}
-          alt={book.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
-      </div>
-    );
-  }
+  const coverSrc = coverUrl || book?.coverUrl || DEFAULT_BOOK_COVER;
+  const fType = fileType || book?.fileType;
+  const ver = version || book?.version;
 
   return (
-    <div className={cn('relative w-full flex flex-col justify-between p-4 overflow-hidden select-none', coverGradient(book.bookId), aspectClass)}>
-      {/* Subtle cover texture overlay */}
-      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:12px_12px]" />
+    <div className={cn('relative w-full overflow-hidden bg-slate-900', aspectClass)}>
+      <img
+        src={coverSrc}
+        alt={title || book?.title || 'Resource Cover'}
+        onError={(e) => {
+          if (e.currentTarget.src !== DEFAULT_BOOK_COVER) {
+            e.currentTarget.src = DEFAULT_BOOK_COVER;
+          }
+        }}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
       
       {/* Top pill */}
-      <div className="relative z-10 flex items-center justify-between">
-        <span className="px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider font-mono">
-          {fileTypeLabel(book.fileType)}
+      <div className="absolute top-2.5 left-2.5 right-2.5 z-10 flex items-center justify-between pointer-events-none">
+        <span className="px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider font-mono shadow-sm">
+          {fileTypeLabel(fType)}
         </span>
-        {book.version && book.version > 1 && (
-          <span className="px-1.5 py-0.5 rounded bg-black/30 backdrop-blur-md text-[9px] font-semibold text-white/90">
-            v{book.version}
+        {ver && ver > 1 && (
+          <span className="px-1.5 py-0.5 rounded bg-black/40 backdrop-blur-md text-[9px] font-semibold text-white/90 shadow-sm font-mono">
+            v{ver}
           </span>
         )}
-      </div>
-
-      {/* Center title presentation */}
-      <div className="relative z-10 my-auto py-2">
-        <h4 className="text-white font-serif text-sm sm:text-base font-semibold leading-tight line-clamp-3 text-shadow-sm">
-          {book.title}
-        </h4>
-        {book.author && (
-          <p className="text-white/70 text-xs mt-1.5 font-medium line-clamp-1">
-            {book.author}
-          </p>
-        )}
-      </div>
-
-      {/* Bottom decorative bar */}
-      <div className="relative z-10 flex items-center justify-between text-white/60 text-[10px] pt-2 border-t border-white/10 font-mono">
-        <span>{book.pages ? `${book.pages} PAGES` : 'DOCUMENT'}</span>
-        <BookOpen size={13} className="text-white/70" />
       </div>
     </div>
   );
@@ -105,7 +86,7 @@ export function ResourceCard({ book, index = 0 }) {
             {/* Author & Rating Footer */}
             <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
               <span className="truncate max-w-[130px] font-medium text-slate-600">
-                {book.author || 'Anonymous'}
+                {typeof book.author === 'object' ? (book.author?.name || 'Anonymous') : (book.author || 'Anonymous')}
               </span>
 
               {book.averageRating > 0 ? (

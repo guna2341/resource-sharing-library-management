@@ -29,12 +29,18 @@ public class Book {
     @Column(name = "root_book_id")
     private Long rootBookId;
 
-    @Column(length = 100)
+    @Column(length = 255)
     @NotBlank(message = "Title is required")
     private String title;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "category", length = 100)
+    private String category;
+
+    @Column(name = "tags", length = 500)
+    private String tags;
 
     private Integer version;
 
@@ -43,7 +49,7 @@ public class Book {
     @Column(name = "cover_url")
     private String coverUrl;
 
-    @Column(name = "file_url")
+    @Column(name = "file_url", columnDefinition = "TEXT")
     @NotBlank(message = "File url is required")
     private String fileUrl;
 
@@ -57,11 +63,11 @@ public class Book {
     @Column(name = "is_current")
     private Boolean isCurrent;
 
-    @JoinColumn(name = "uploaded_by")
+    @JoinColumn(name = "uploaded_by", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private User uploadedBy;
 
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Author author;
 

@@ -49,6 +49,41 @@ public class AuthorController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{authorId}/follow")
+    public ResponseEntity<ApiResponse> followAuthor(
+            @PathVariable Long authorId,
+            @RequestParam(required = false) Long userId
+    ) {
+        Long currentUserId = com.library.Resource.Sharing.Library.Management.security.SecurityUtils.getCurrentUserId().orElse(userId);
+        if (currentUserId == null) {
+            return ResponseEntity.status(401).body(new ApiResponse(false, "Authentication required to follow author."));
+        }
+        ApiResponse response = authorService.followAuthor(authorId, currentUserId);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{authorId}/follow")
+    public ResponseEntity<ApiResponse> unfollowAuthor(
+            @PathVariable Long authorId,
+            @RequestParam(required = false) Long userId
+    ) {
+        Long currentUserId = com.library.Resource.Sharing.Library.Management.security.SecurityUtils.getCurrentUserId().orElse(userId);
+        if (currentUserId == null) {
+            return ResponseEntity.status(401).body(new ApiResponse(false, "Authentication required to unfollow author."));
+        }
+        ApiResponse response = authorService.unfollowAuthor(authorId, currentUserId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/following")
+    public ResponseEntity<ApiResponse> getFollowing(@RequestParam(required = false) Long userId) {
+        Long currentUserId = com.library.Resource.Sharing.Library.Management.security.SecurityUtils.getCurrentUserId().orElse(userId);
+        if (currentUserId == null) {
+            return ResponseEntity.ok(new ApiResponse(true, "Followed authors retrieved.", java.util.Collections.emptyList()));
+        }
+        ApiResponse response = authorService.getFollowedAuthorIds(currentUserId);
+        return ResponseEntity.ok(response);
+    }
 
 }
 

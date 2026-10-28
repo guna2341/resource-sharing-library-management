@@ -7,6 +7,8 @@ import lombok.Data;
 @Builder
 public class UserSummaryResponse {
 
+    Long userId;
+
     String username;
 
     String profileUrl;

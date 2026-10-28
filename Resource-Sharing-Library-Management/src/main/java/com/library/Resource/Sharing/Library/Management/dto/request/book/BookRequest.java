@@ -1,15 +1,12 @@
 package com.library.Resource.Sharing.Library.Management.dto.request.book;
 
 import com.library.Resource.Sharing.Library.Management.enums.FileType;
-import com.library.Resource.Sharing.Library.Management.model.Author;
-import com.library.Resource.Sharing.Library.Management.model.User;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.hibernate.validator.constraints.URL;
 
 @Data
 public class BookRequest {
@@ -18,6 +15,10 @@ public class BookRequest {
     private String title;
 
     private String description;
+
+    private String category;
+
+    private String tags;
 
     @NotNull(message = "Pages is required")
     @Min(1)

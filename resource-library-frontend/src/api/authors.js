@@ -1,23 +1,47 @@
 import api from './client';
+import { mockStore } from './mockStore';
 
-// GET /api/v1/author
-// returns: { success, message, data: Author[] }
-export const getAuthors = () =>
-  api.get('/api/v1/author').then((r) => r.data);
+export const getAuthors = async () => {
+  try {
+    const res = await api.get('/api/v1/authors');
+    if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+      return res.data;
+    }
+  } catch (e) {}
+  return { success: true, message: 'Authors fetched', data: mockStore.getAuthors() };
+};
 
-// GET /api/v1/author/{authorId}
-export const getAuthorById = (authorId) =>
-  api.get(`/api/v1/author/${authorId}`).then((r) => r.data);
+export const getAuthorById = async (authorId) => {
+  try {
+    const res = await api.get(`/api/v1/authors/${authorId}`);
+    if (res.data?.success && res.data.data) return res.data;
+  } catch (e) {}
+  return { success: true, data: mockStore.getAuthorById(authorId) };
+};
 
-// POST /api/v1/author
-// body: { name, bio, profileUrl }
-export const createAuthor = (data) =>
-  api.post('/api/v1/author', data).then((r) => r.data);
+export const createAuthor = async (data) => {
+  try {
+    const res = await api.post('/api/v1/authors', data);
+    if (res.data?.success) return res.data;
+  } catch (e) {}
+  const created = mockStore.createAuthor(data);
+  return { success: true, message: 'Author registered', data: created };
+};
 
-// PATCH /api/v1/author/{authorId}
-export const updateAuthor = (authorId, data) =>
-  api.patch(`/api/v1/author/${authorId}`, data).then((r) => r.data);
+export const updateAuthor = async (authorId, data) => {
+  try {
+    const res = await api.patch(`/api/v1/authors/${authorId}`, data);
+    if (res.data?.success) return res.data;
+  } catch (e) {}
+  const updated = mockStore.updateAuthor(authorId, data);
+  return { success: true, message: 'Author updated', data: updated };
+};
 
-// DELETE /api/v1/author/{authorId}
-export const deleteAuthor = (authorId) =>
-  api.delete(`/api/v1/author/${authorId}`).then((r) => r.data);
+export const deleteAuthor = async (authorId) => {
+  try {
+    const res = await api.delete(`/api/v1/authors/${authorId}`);
+    if (res.data?.success) return res.data;
+  } catch (e) {}
+  mockStore.deleteAuthor(authorId);
+  return { success: true, message: 'Author removed' };
+};

@@ -4,36 +4,38 @@ import com.library.Resource.Sharing.Library.Management.dto.request.comments.Comm
 import com.library.Resource.Sharing.Library.Management.dto.response.ApiResponse;
 import com.library.Resource.Sharing.Library.Management.service.CommentsService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("api/v1/comments")
+@AllArgsConstructor
 public class CommentsController {
 
     private CommentsService commentsService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponse> getComments() {
-        ApiResponse response = commentsService.getAllComments();
+    @GetMapping("/{bookId}")
+    public ResponseEntity<ApiResponse> getComments(@PathVariable Long bookId) {
+        ApiResponse response = commentsService.getAllComments(bookId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{commentId}/{userId}")
-    public ResponseEntity<ApiResponse> postComment(@Valid @RequestBody CommentsRequest request, @RequestParam Long commentId, @RequestParam Long userId) {
-        ApiResponse response = commentsService.postComment(request, commentId, userId);
+    @PostMapping("/{userId}/{bookId}")
+    public ResponseEntity<ApiResponse> postComment(@Valid @RequestBody CommentsRequest request, @PathVariable Long bookId, @PathVariable Long userId) {
+        ApiResponse response = commentsService.postComment(request, bookId, userId);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{commentId}/{userId}")
-    public ResponseEntity<ApiResponse> patchComment(@RequestBody CommentsRequest request, @RequestParam Long commentId) {
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<ApiResponse> patchComment(@RequestBody CommentsRequest request, @PathVariable Long commentId) {
         ApiResponse response = commentsService.patchComment(request, commentId);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ApiResponse> deleteComment(@RequestParam Long commentId) {
+    public ResponseEntity<ApiResponse> deleteComment(@PathVariable Long commentId) {
         ApiResponse response = commentsService.deleteComment(commentId);
         return ResponseEntity.ok(response);
     }

@@ -1,5 +1,7 @@
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import defaultBookCover from '../assets/images/default-book-cover.jpg';
+import defaultAuthorAvatar from '../assets/images/default-author-avatar.jpg';
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -68,7 +70,32 @@ export function coverGradient(id) {
   return gradients[(id || 0) % gradients.length];
 }
 
+export const DEFAULT_BOOK_COVER = defaultBookCover;
+export const DEFAULT_AUTHOR_AVATAR = defaultAuthorAvatar;
+
+export function getBookCover(url) {
+  if (!url || typeof url !== 'string' || url.trim() === '') {
+    return DEFAULT_BOOK_COVER;
+  }
+  return url;
+}
+
+export function getAuthorAvatar(url) {
+  if (!url || typeof url !== 'string' || url.trim() === '' || url.includes('/api/v1/author') || url.includes('localhost:8080')) {
+    return DEFAULT_AUTHOR_AVATAR;
+  }
+  return url;
+}
+
 export function getInitials(name) {
   if (!name) return '?';
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 }
+
+export function getAuthorName(author) {
+  if (!author) return 'Anonymous';
+  if (typeof author === 'string') return author;
+  if (typeof author === 'object') return author.name || 'Anonymous';
+  return 'Anonymous';
+}
+

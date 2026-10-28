@@ -36,6 +36,10 @@ public class BookDetailsResponse {
 
     private String description;
 
+    private String category;
+
+    private String tags;
+
     private Integer version;
 
     private Integer pages;
